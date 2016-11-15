@@ -12,6 +12,12 @@ class NewVisitorTest(unittest.TestCase):
     self.browser.quit()
   # end
 
+  def check_for_row_in_list_table(self, row_text):
+    table = self.browser.find_element_by_id('id_list_table')
+    rows = table.find_elements_by_tag_name('tr')
+    self.assertIn(row_text, [row.text for row in rows])
+  # end
+
   def test_can_start_a_list_and_retrieve_it_later(self):
     # User goes online to check out the home page
     self.browser.get('http://localhost:8000')
@@ -37,12 +43,8 @@ class NewVisitorTest(unittest.TestCase):
     # the page lists 1: Buy Peacock Feathers as an item in
     # the to-do list table
     inputbox.send_keys(Keys.ENTER)
-
-    table = self.browser.find_element_by_id(
-        'id_list_table')
-    rows = table.find_elements_by_tag_name('tr')
-    self.assertIn('1: Buy Peacock Feathers',
-        [row.text for row in rows])
+    self.check_for_row_in_list_table(
+        '1: Buy Peacock Feathers')
 
     # The user enters another item and clicks enter
     inputbox = self.browser.find_element_by_id(
@@ -51,12 +53,10 @@ class NewVisitorTest(unittest.TestCase):
     inputbox.send_keys(Keys.ENTER)
 
     # The page updates again, now shows both items
-    table = self.browser.find_element_by_id('id_list_table')
-    rows = table.find_elements_by_tag_name('tr')
-    self.assertIn('1: Buy Peacock Feathers',
-        [row.text for row in rows])
-    self.assertIn('2: Use Peacock Feathers to make a fly',
-        [row.text for row in rows])
+    self.check_for_row_in_list_table(
+        '1: Buy Peacock Feathers')
+    self.check_for_row_in_list_table(
+        '2: Use Peacock Feathers to make a fly')
 
     self.fail("Finish this test")
   # end
