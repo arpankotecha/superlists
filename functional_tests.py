@@ -41,10 +41,22 @@ class NewVisitorTest(unittest.TestCase):
     table = self.browser.find_element_by_id(
         'id_list_table')
     rows = table.find_elements_by_tag_name('tr')
-    self.assertTrue(
-        any(row.text == '1: Buy Peacock Feathers' for row \
-            in rows),
-        "New Todo Item did not show up in the table")
+    self.assertIn('1: Buy Peacock Feathers',
+        [row.text for row in rows])
+
+    # The user enters another item and clicks enter
+    inputbox = self.browser.find_element_by_id(
+        'id_new_item')
+    inputbox.send_keys("Use Peacock Feathers to make a fly")
+    inputbox.send_keys(Keys.ENTER)
+
+    # The page updates again, now shows both items
+    table = self.browser.find_element_by_id('id_list_table')
+    rows = table.find_elements_by_tag_name('tr')
+    self.assertIn('1: Buy Peacock Feathers',
+        [row.text for row in rows])
+    self.assertIn('2: Use Peacock Feathers to make a fly',
+        [row.text for row in rows])
 
     self.fail("Finish this test")
   # end
