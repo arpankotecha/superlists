@@ -1,11 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
 import unittest
 
 class NewVisitorTest(unittest.TestCase):
   def setUp(self):
-    self.browser = webdriver.Firefox()
-    self.browser.implicitly_wait(3)
+    self.browser = webdriver.Chrome()
+    self.browser.implicitly_wait(5)
   # end
 
   def tearDown(self):
@@ -43,6 +44,7 @@ class NewVisitorTest(unittest.TestCase):
     # the page lists 1: Buy Peacock Feathers as an item in
     # the to-do list table
     inputbox.send_keys(Keys.ENTER)
+    WebDriverWait(self.browser, 120)
     self.check_for_row_in_list_table(
         '1: Buy Peacock Feathers')
 
