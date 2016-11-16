@@ -41,11 +41,12 @@ class NewVisitorTest(LiveServerTestCase):
     # box
     inputbox.send_keys('Buy Peacock Feathers')
 
-    # When the user presses enter, the page updates and now
+    # When the user presses enter, taken to a new url
     # the page lists 1: Buy Peacock Feathers as an item in
     # the to-do list table
     inputbox.send_keys(Keys.ENTER)
-    WebDriverWait(self.browser, 120)
+    list_url = self.browser.current_url
+    self.assertRegex(list_url, '/lists/.+')
     self.check_for_row_in_list_table(
         '1: Buy Peacock Feathers')
 
@@ -60,6 +61,36 @@ class NewVisitorTest(LiveServerTestCase):
         '1: Buy Peacock Feathers')
     self.check_for_row_in_list_table(
         '2: Use Peacock Feathers to make a fly')
+
+    # Now a new user comes to the site. The previous users
+    # list should not be on there.
+    self.browser.quit()
+    self.browser = webdriver.Chrome()
+
+    # Francis visits the home page. There is no sign of 
+    # Ediths list
+    self.browser.get(self.live_server_url)
+    page_text = self.browser.find_element_by_tag_name(
+        'body').text
+    self.assertNotIn('Buy Peacock Feathers', page_text)
+    self.assertNotIn('make a fly', page_text)
+
+    # Francis stats a new list
+    inputbox = self.browser.find_element_by_id(
+        'id_new_item')
+    inputbox.send_keys('Buy Milk')
+    inputbox.send_keys(Keys.ENTER)
+
+    # Francis gets his own unique url
+    francis_list_url = self.browser.current_url
+    self.assertRegex(francis_list_url, '/lists/.+')
+    self.assertNotEqual(francis_list_url, list_url)
+
+    # This should not have ediths list.
+    page_text = self.browser.find_element_by_tag_name(
+        'body').text
+    self.assertNotIn('Buy Peacock Feathers', page_text)
+    self.assertIn('Buy Milk', page_text)
 
     self.fail("Finish this test")
   # end
